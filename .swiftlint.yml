@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: LGPL-3.0-only OR LicenseRef-Taira-Commercial
+# Copyright (c) 2025 Taira. All rights reserved.
+
+# SwiftLint configuration for TairaWireGuard
+
+# Paths
+included:
+  - Sources
+  - Tests
+
+excluded:
+  - .build
+  - Packages
+  - Sources/BoringTunFFI
+
+# Rules
+disabled_rules:
+  - trailing_whitespace
+
+opt_in_rules:
+  - explicit_type_interface
+  - fatal_error_message
+
+# Line length
+line_length:
+  warning: 120
+  error: 150
+
+# Identifier naming
+identifier_name:
+  min_length:
+    warning: 2
+  excluded:
+    - id
+    - ip
+    - to
+    - x
+    - y

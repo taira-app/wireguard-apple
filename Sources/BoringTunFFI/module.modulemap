@@ -1,0 +1,4 @@
+module BoringTunFFI {
+    header "boringtun.h"
+    export *
+}

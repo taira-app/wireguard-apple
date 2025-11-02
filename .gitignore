@@ -1,0 +1,22 @@
+# Local development
+TODO.md
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# BoringTun build artifacts
+Sources/BoringTunFFI/out/
+Sources/BoringTunFFI/.tmp/
+*.a
+*.rlib
+
+# Xcode
+*.xcodeproj
+*.xcworkspace
+xcuserdata/
+DerivedData/
+
+# Platform artifactsC
+.DS_Store
