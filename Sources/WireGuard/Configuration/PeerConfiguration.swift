@@ -215,56 +215,25 @@ public struct PeerConfiguration: Sendable, Equatable, Hashable {
 
 	// MARK: - Equatable conformance
 
-	/// Compares two peer configurations for equality.
+	/// Compares two peer configurations for equality based on public key.
 	///
-	/// Two peer configurations are considered equal if all their configuration
-	/// fields have identical values. Configuration fields include:
-	/// - Public key
-	/// - Preshared key
-	/// - Allowed IPs (order-independent)
-	/// - Endpoint
-	/// - Persistent keepalive
+	/// Two peer configurations are equal if they have the same public key,
+	/// which uniquely identifies a peer. This matches the Hashable implementation
+	/// which also uses only the public key, satisfying the Swift requirement that
+	/// equal objects must have equal hash values.
 	///
-	/// Statistics fields (receivedBytes, transmittedBytes, lastHandshakeTime)
-	/// are deliberately excluded from comparison because they represent runtime
-	/// state rather than configuration. Two peers with the same configuration but
-	/// different statistics are considered equal.
-	///
-	/// This allows configurations to be compared for equivalence while ignoring
-	/// transient runtime data.
+	/// Note: To compare full configuration including endpoint, allowed IPs, etc.,
+	/// compare the individual fields directly rather than using ==.
 	///
 	/// - Parameters:
 	///   - lhs: The left-hand peer configuration
 	///   - rhs: The right-hand peer configuration
-	/// - Returns: `true` if both configurations have identical settings
+	/// - Returns: `true` if both configurations have the same public key
 	public static func == (lhs: PeerConfiguration, rhs: PeerConfiguration) -> Bool {
-		// Compare public key (peer identity)
-		guard lhs.publicKey == rhs.publicKey else {
-			return false
-		}
-
-		// Compare preshared key
-		guard lhs.presharedKey == rhs.presharedKey else {
-			return false
-		}
-
-		// Compare allowed IPs (order-independent)
-		guard Set(lhs.allowedIPs) == Set(rhs.allowedIPs) else {
-			return false
-		}
-
-		// Compare endpoint
-		guard lhs.endpoint == rhs.endpoint else {
-			return false
-		}
-
-		// Compare persistent keepalive
-		guard lhs.persistentKeepalive == rhs.persistentKeepalive else {
-			return false
-		}
-
-		// Statistics are intentionally not compared
-		return true
+		// Compare only the public key (peer identity)
+		// This matches hash(into:) which also uses only the public key,
+		// satisfying the Hashable contract that equal objects must have equal hashes
+		return lhs.publicKey == rhs.publicKey
 	}
 
 	// MARK: - Hashable conformance

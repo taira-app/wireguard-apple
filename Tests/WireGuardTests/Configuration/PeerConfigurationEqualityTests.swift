@@ -103,12 +103,12 @@ struct PeerConfigurationEqualityTests {
 		#expect(peer1 == peer2)
 	}
 
-	/// Test that peers with different endpoints are not equal.
+	/// Test that peers with same public key but different endpoints are equal.
 	///
-	/// Different endpoints mean different network destinations.
-	@Test("Peers with different endpoints are not equal")
-	func peersWithDifferentEndpointsAreNotEqual() throws {
-		// Given: two peers with different endpoints
+	/// Equality is based solely on public key (peer identity), not configuration.
+	@Test("Peers with same public key but different endpoints are equal")
+	func peersWithSamePublicKeyButDifferentEndpointsAreEqual() throws {
+		// Given: two peers with same public key but different endpoints
 		let publicKey = makePublicKey()
 
 		var peer1 = PeerConfiguration(publicKey: publicKey)
@@ -117,16 +117,16 @@ struct PeerConfigurationEqualityTests {
 		var peer2 = PeerConfiguration(publicKey: publicKey)
 		peer2.endpoint = try #require(Endpoint(from: "192.168.1.2:51820"))
 
-		// Then: peers are not equal
-		#expect(peer1 != peer2)
+		// Then: peers are equal (same public key)
+		#expect(peer1 == peer2)
 	}
 
-	/// Test that peers with different allowed IPs are not equal.
+	/// Test that peers with same public key but different allowed IPs are equal.
 	///
-	/// Different allowed IPs mean different routing configuration.
-	@Test("Peers with different allowed IPs are not equal")
-	func peersWithDifferentAllowedIPsAreNotEqual() throws {
-		// Given: two peers with different allowed IPs
+	/// Equality is based solely on public key (peer identity), not configuration.
+	@Test("Peers with same public key but different allowed IPs are equal")
+	func peersWithSamePublicKeyButDifferentAllowedIPsAreEqual() throws {
+		// Given: two peers with same public key but different allowed IPs
 		let publicKey = makePublicKey()
 
 		var peer1 = PeerConfiguration(publicKey: publicKey)
@@ -135,8 +135,8 @@ struct PeerConfigurationEqualityTests {
 		var peer2 = PeerConfiguration(publicKey: publicKey)
 		peer2.allowedIPs = [try makeIPv6AddressRange()]
 
-		// Then: peers are not equal
-		#expect(peer1 != peer2)
+		// Then: peers are equal (same public key)
+		#expect(peer1 == peer2)
 	}
 
 	// MARK: - Hashable tests
