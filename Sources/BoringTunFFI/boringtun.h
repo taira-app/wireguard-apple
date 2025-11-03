@@ -4,7 +4,7 @@
 #ifndef BORINGTUN_H
 #define BORINGTUN_H
 
-// Include the BoringTun FFI header from the submodule
-#include "../../Packages/boringtun/boringtun/src/wireguard_ffi.h"
+// Include the BoringTun FFI header
+#include "wireguard_ffi.h"
 
 #endif // BORINGTUN_H

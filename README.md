@@ -21,8 +21,13 @@ Key architectural components:
 
 ## Platform support
 
-- macOS 13.0 or later
-- iOS 15.0 or later
+Currently supported platforms:
+- macOS 13.0 or later (ARM64 / Apple Silicon)
+- iOS 15.0 or later (ARM64 device)
+
+Platform support limitations:
+- **iOS simulator**: Not currently supported due to BoringTun dependency build issues (see known issues below)
+- **macOS Intel (x86_64)**: Not currently built in XCFramework but can be added if needed
 
 ## Building
 
@@ -42,23 +47,30 @@ rustup target add x86_64-apple-ios         # iOS simulator x86_64
 rustup target add aarch64-apple-ios-sim    # iOS simulator arm64
 ```
 
-### Build BoringTun static library
+### Build BoringTun XCFramework
 
-Before building the Swift package, you must build the BoringTun static library:
+Before building the Swift package, you must build the BoringTun XCFramework:
 
 ```bash
-# Build for macOS (current architecture)
+# Build XCFramework for all supported platforms
 cd Sources/BoringTunFFI
-make build
-
-# Or build for specific architectures
-make build ARCHS="arm64 x86_64"
+make build-xcframework
 
 # Clean build artifacts
 make clean
 ```
 
-This creates `Sources/BoringTunFFI/out/libboringtun.a` which the Swift package will link against.
+This creates `BoringTun.xcframework` containing static libraries for:
+- macOS ARM64 (Apple Silicon)
+- iOS ARM64 (device only)
+
+**Note on iOS Simulator**: Simulator support is temporarily unavailable due to a build issue in the `ring` cryptography crate (a BoringTun dependency). The ring crate version 0.16.20 contains outdated build scripts that fail when targeting `aarch64-apple-ios-sim` with the error:
+
+```
+clang: error: unknown argument: '-arch arm64'
+```
+
+This is a known issue in BoringTun's dependency chain. Device builds work perfectly - only simulator builds are affected. Simulator support will be restored when BoringTun upgrades to a newer ring version with fixed build scripts, or when we implement a workaround.
 
 ### Build Swift package
 
@@ -70,7 +82,7 @@ swift build
 swift test
 
 # Run linter
-swiftlint
+swiftlint lint --strict
 
 # Format code
 swift-format --recursive --in-place Sources Tests
@@ -81,12 +93,32 @@ swift-format --recursive --in-place Sources Tests
 - Swift 6.0 or later
 - Rust toolchain (for building BoringTun)
 - Xcode 16.0 or later (for iOS/macOS development)
+- ARM64 device for iOS testing (simulator not currently supported)
+
+## Known issues
+
+### iOS simulator support
+
+iOS simulator builds are currently unavailable due to a build failure in the `ring` crate (version 0.16.20), which is a dependency of BoringTun. The ring crate uses an outdated version of the `cc-rs` build dependency that fails when compiling for the iOS simulator target (`aarch64-apple-ios-sim`).
+
+**Error**: `clang: error: unknown argument: '-arch arm64'`
+
+**Root cause**: The ring 0.16.20 crate depends on an old version of cc-rs that has [a known issue](https://github.com/rust-lang/cc-rs/issues/711) with the aarch64-apple-ios-sim target. This was fixed in cc-rs 1.0.79+, but ring 0.16.20 hasn't updated its dependency.
+
+**Workaround**: Use a physical iOS device for development and testing. All functionality works correctly on actual hardware.
+
+**Resolution path**: This issue will be resolved when:
+1. BoringTun upgrades to a newer version of ring (0.17+) that uses cc-rs 1.0.79 or later, or
+2. We implement a build script workaround to patch ring's dependencies
+
+Device builds for both macOS and iOS work perfectly - only simulator builds are affected.
 
 ## License
 
 This project is dual-licensed under your choice of:
 
-- **LGPL-3.0-only**: Free for open source use. Derivative works must also be licensed under LGPL-3.0.
-- **Commercial License**: For proprietary or closed-source applications. Contact licensing@taira.cloud for terms.
+- **LGPL-3.0-only**: Free for any use, including proprietary applications. You can link this library to closed-source code. Only modifications to the library itself must be open sourced under LGPL-3.0. Your application code remains under your chosen license.
 
-See `LICENSES/` directory for full license texts.
+- **Commercial license**: Alternative licensing for organizations that prefer commercial terms. Contact us at taira.cloud/licensing for details.
+
+See `LICENSE.txt` for the full LGPL-3.0 license text.

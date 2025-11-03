@@ -16,21 +16,14 @@ let package = Package(
     targets: [
         .target(
             name: "WireGuard",
-            dependencies: ["BoringTunFFI"],
+            dependencies: ["BoringTun"],
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency")
             ]
         ),
-        .target(
-            name: "BoringTunFFI",
-            dependencies: [],
-            exclude: [
-                "Makefile"
-            ],
-            publicHeadersPath: ".",
-            linkerSettings: [
-                .linkedLibrary("boringtun")
-            ]
+        .binaryTarget(
+            name: "BoringTun",
+            path: "BoringTun.xcframework"
         ),
         .testTarget(
             name: "WireGuardTests",

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only OR LicenseRef-Taira-Commercial
 // Copyright (c) 2025 Taira. All rights reserved.
 
-import BoringTunFFI
+import BoringTun
 import Foundation
 import XCTest
 
@@ -76,9 +76,9 @@ final class X25519KeyTests: XCTestCase {
 	func testInitFromCKey() {
 		// Create a C key structure with known data
 		var cKey = x25519_key()
-		for i in 0..<32 {
+		for byteIndex in 0..<32 {
 			withUnsafeMutableBytes(of: &cKey.key) { buffer in
-				buffer[i] = UInt8(i)  // Fill with 0, 1, 2, ..., 31
+				buffer[byteIndex] = UInt8(byteIndex)  // Fill with 0, 1, 2, ..., 31
 			}
 		}
 
@@ -88,11 +88,11 @@ final class X25519KeyTests: XCTestCase {
 		// Verify the bytes were copied correctly
 		XCTAssertEqual(swiftKey.bytes.count, 32, "Key should have 32 bytes")
 
-		for i in 0..<32 {
+		for byteIndex in 0..<32 {
 			XCTAssertEqual(
-				swiftKey.bytes[i],
-				UInt8(i),
-				"Byte at index \(i) should be \(i)"
+				swiftKey.bytes[byteIndex],
+				UInt8(byteIndex),
+				"Byte at index \(byteIndex) should be \(byteIndex)"
 			)
 		}
 	}
@@ -104,8 +104,8 @@ final class X25519KeyTests: XCTestCase {
 	func testConvertToCKey() {
 		// Create a Swift key with known data
 		var keyData = Data(count: 32)
-		for i in 0..<32 {
-			keyData[i] = UInt8(i)  // Fill with 0, 1, 2, ..., 31
+		for byteIndex in 0..<32 {
+			keyData[byteIndex] = UInt8(byteIndex)  // Fill with 0, 1, 2, ..., 31
 		}
 		let swiftKey = X25519Key(data: keyData)!
 
@@ -114,11 +114,11 @@ final class X25519KeyTests: XCTestCase {
 
 		// Verify the bytes were copied correctly
 		withUnsafeBytes(of: cKey.key) { buffer in
-			for i in 0..<32 {
+			for byteIndex in 0..<32 {
 				XCTAssertEqual(
-					buffer[i],
-					UInt8(i),
-					"Byte at index \(i) should be \(i)"
+					buffer[byteIndex],
+					UInt8(byteIndex),
+					"Byte at index \(byteIndex) should be \(byteIndex)"
 				)
 			}
 		}
@@ -132,8 +132,8 @@ final class X25519KeyTests: XCTestCase {
 	func testRoundTripConversion() {
 		// Create original Swift key with random-like data
 		var originalData = Data(count: 32)
-		for i in 0..<32 {
-			originalData[i] = UInt8((i * 7 + 13) % 256)  // Pseudo-random pattern
+		for byteIndex in 0..<32 {
+			originalData[byteIndex] = UInt8((byteIndex * 7 + 13) % 256)  // Pseudo-random pattern
 		}
 		let originalKey = X25519Key(data: originalData)!
 
@@ -156,9 +156,9 @@ final class X25519KeyTests: XCTestCase {
 	func testRoundTripConversionFromC() {
 		// Create original C key with known data
 		var originalCKey = x25519_key()
-		for i in 0..<32 {
+		for byteIndex in 0..<32 {
 			withUnsafeMutableBytes(of: &originalCKey.key) { buffer in
-				buffer[i] = UInt8((i * 3 + 7) % 256)  // Different pattern
+				buffer[byteIndex] = UInt8((byteIndex * 3 + 7) % 256)  // Different pattern
 			}
 		}
 
@@ -169,11 +169,11 @@ final class X25519KeyTests: XCTestCase {
 		// Verify bytes are identical
 		withUnsafeBytes(of: originalCKey.key) { originalBuffer in
 			withUnsafeBytes(of: roundTrippedCKey.key) { roundTrippedBuffer in
-				for i in 0..<32 {
+				for byteIndex in 0..<32 {
 					XCTAssertEqual(
-						roundTrippedBuffer[i],
-						originalBuffer[i],
-						"Byte at index \(i) should be preserved"
+						roundTrippedBuffer[byteIndex],
+						originalBuffer[byteIndex],
+						"Byte at index \(byteIndex) should be preserved"
 					)
 				}
 			}
@@ -221,7 +221,7 @@ final class X25519KeyTests: XCTestCase {
 		// Send to another isolation domain
 		await Task {
 			// If this compiles without Sendable warnings, conformance is correct
-			let _ = key
+			_ = key
 		}.value
 	}
 

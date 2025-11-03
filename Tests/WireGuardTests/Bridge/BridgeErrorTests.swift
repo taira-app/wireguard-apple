@@ -38,7 +38,8 @@ final class BridgeErrorTests: XCTestCase {
 		// Verify recovery guidance
 		XCTAssertEqual(
 			error.recoverySuggestion,
-			"Verify that the private key, peer public key, and optional pre-shared key are valid base64-encoded x25519 keys."
+			"Verify that the private key, peer public key, and optional pre-shared key "
+				+ "are valid base64-encoded x25519 keys."
 		)
 	}
 
@@ -91,7 +92,8 @@ final class BridgeErrorTests: XCTestCase {
 		// Provide common troubleshooting steps
 		XCTAssertEqual(
 			error.recoverySuggestion,
-			"This may indicate packet authentication failure, invalid tunnel state, or malformed input data. Check tunnel connectivity and peer configuration."
+			"This may indicate packet authentication failure, invalid tunnel state, or "
+				+ "malformed input data. Check tunnel connectivity and peer configuration."
 		)
 	}
 
@@ -119,7 +121,8 @@ final class BridgeErrorTests: XCTestCase {
 		// Generic recovery suggestion still applies
 		XCTAssertEqual(
 			error.recoverySuggestion,
-			"This may indicate packet authentication failure, invalid tunnel state, or malformed input data. Check tunnel connectivity and peer configuration."
+			"This may indicate packet authentication failure, invalid tunnel state, or "
+				+ "malformed input data. Check tunnel connectivity and peer configuration."
 		)
 	}
 
@@ -137,7 +140,7 @@ final class BridgeErrorTests: XCTestCase {
 		// Send it to another isolation domain (async Task)
 		await Task {
 			// If this compiles without Sendable warnings, conformance is correct
-			let _ = error
+			_ = error
 		}.value
 	}
 

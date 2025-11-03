@@ -18,7 +18,6 @@ disabled_rules:
   - trailing_whitespace
 
 opt_in_rules:
-  - explicit_type_interface
   - fatal_error_message
 
 # Line length

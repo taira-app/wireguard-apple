@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only OR LicenseRef-Taira-Commercial
 // Copyright (c) 2025 Taira. All rights reserved.
 
-import BoringTunFFI
+import BoringTun
 import XCTest
 
 @testable import WireGuard
@@ -99,15 +99,24 @@ final class WireGuardResultTests: XCTestCase {
 	/// Verifies that each ResultOperation case can be correctly created
 	/// from its corresponding C enum value and that size values are preserved.
 	func testAllOperationTypes() {
-		let testCases: [(UInt32, ResultOperation, Int)] = [
-			(0, .done, 0),                      // No output
-			(1, .writeToNetwork, 148),          // Handshake message
-			(2, .error, 0),                     // Error, no output
-			(4, .writeToTunnelIPv4, 1500),      // IPv4 packet
-			(6, .writeToTunnelIPv6, 1500),      // IPv6 packet
+		struct TestCase {
+			let rawValue: UInt32
+			let expectedOp: ResultOperation
+			let expectedSize: Int
+		}
+
+		let testCases = [
+			TestCase(rawValue: 0, expectedOp: .done, expectedSize: 0),  // No output
+			TestCase(rawValue: 1, expectedOp: .writeToNetwork, expectedSize: 148),  // Handshake message
+			TestCase(rawValue: 2, expectedOp: .error, expectedSize: 0),  // Error, no output
+			TestCase(rawValue: 4, expectedOp: .writeToTunnelIPv4, expectedSize: 1500),  // IPv4 packet
+			TestCase(rawValue: 6, expectedOp: .writeToTunnelIPv6, expectedSize: 1500)  // IPv6 packet
 		]
 
-		for (rawValue, expectedOp, expectedSize) in testCases {
+		for testCase in testCases {
+			let rawValue = testCase.rawValue
+			let expectedOp = testCase.expectedOp
+			let expectedSize = testCase.expectedSize
 			var cResult = wireguard_result()
 			cResult.op = result_type(rawValue: rawValue)
 			cResult.size = expectedSize
@@ -135,7 +144,7 @@ final class WireGuardResultTests: XCTestCase {
 		// Send it to another isolation domain
 		await Task {
 			// If this compiles without Sendable warnings, conformance is correct
-			let _ = result
+			_ = result
 		}.value
 	}
 

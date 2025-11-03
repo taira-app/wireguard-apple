@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only OR LicenseRef-Taira-Commercial
 // Copyright (c) 2025 Taira. All rights reserved.
 
-import BoringTunFFI
+import BoringTun
 import Foundation
 
 /// A 32-byte x25519 Curve25519 cryptographic key for FFI interop.

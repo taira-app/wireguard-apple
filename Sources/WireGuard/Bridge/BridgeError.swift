@@ -68,12 +68,9 @@ public enum BridgeError: Error, LocalizedError, Sendable, Equatable {
 		case .tunnelCreationFailed:
 			return "Failed to create WireGuard tunnel"
 		case .invalidHandle:
-			return "Invalid tunnel handle"
-		case .operationFailed(let details):
-			if let details = details {
-				return "Tunnel operation failed: \(details)"
-			}
-			return "Tunnel operation failed"
+			return "No active WireGuard tunnel"
+		case .operationFailed:
+			return "WireGuard operation failed"
 		case .invalidKey:
 			return "Invalid cryptographic key"
 		case .invalidPacket:
@@ -87,16 +84,17 @@ public enum BridgeError: Error, LocalizedError, Sendable, Equatable {
 	public var failureReason: String? {
 		switch self {
 		case .tunnelCreationFailed:
-			return "The BoringTun library could not initialize a new tunnel instance. " +
-				"This may be due to invalid keys or insufficient system resources."
+			return "BoringTun returned null when creating the tunnel."
 		case .invalidHandle:
-			return "Attempted to use a tunnel that has been deallocated or was never properly created."
-		case .operationFailed:
-			return "The packet processing operation failed, possibly due to authentication failure, " +
-				"invalid packet format, or internal state issues."
+			return "Attempted to perform an operation without an active tunnel."
+		case .operationFailed(let details):
+			if let details = details {
+				return details
+			}
+			return "The operation completed but BoringTun returned an error result."
 		case .invalidKey:
-			return "The provided cryptographic key failed validation. Keys must be 32 bytes " +
-				"encoded in base64 format."
+			return "The provided cryptographic key failed validation. Keys must be 32 bytes "
+				+ "encoded in base64 format."
 		case .invalidPacket:
 			return "The packet data is malformed or has invalid length for WireGuard processing."
 		case .memoryError:
@@ -108,23 +106,23 @@ public enum BridgeError: Error, LocalizedError, Sendable, Equatable {
 	public var recoverySuggestion: String? {
 		switch self {
 		case .tunnelCreationFailed:
-			return "Verify that all cryptographic keys are valid base64-encoded 32-byte values. " +
-				"Check system logs for additional details from BoringTun."
+			return "Verify that the private key, peer public key, and optional pre-shared key are valid "
+				+ "base64-encoded x25519 keys."
 		case .invalidHandle:
-			return "This is a programming error. Ensure tunnel operations only occur while " +
-				"the tunnel is active and before it is deallocated."
+			return "Create a tunnel using createTunnel() before calling packet processing or "
+				+ "statistics methods."
 		case .operationFailed:
-			return "Retry the operation. If the problem persists, the peer may be using " +
-				"incompatible keys or the network connection may be corrupted."
+			return "This may indicate packet authentication failure, invalid tunnel state, or "
+				+ "malformed input data. Check tunnel connectivity and peer configuration."
 		case .invalidKey:
-			return "Generate a new valid key using x25519_secret_key() or verify the key " +
-				"is properly base64-encoded."
+			return "Generate a new valid key using x25519_secret_key() or verify the key "
+				+ "is properly base64-encoded."
 		case .invalidPacket:
-			return "Verify the packet source is providing valid IP packets (IPv4 or IPv6) " +
-				"or valid WireGuard protocol messages."
+			return "Verify the packet source is providing valid IP packets (IPv4 or IPv6) "
+				+ "or valid WireGuard protocol messages."
 		case .memoryError:
-			return "Close other applications to free system memory, or reduce the packet " +
-				"buffer sizes if configured."
+			return "Close other applications to free system memory, or reduce the packet "
+				+ "buffer sizes if configured."
 		}
 	}
 }

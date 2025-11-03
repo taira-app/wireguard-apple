@@ -11,6 +11,7 @@ Sources/BoringTunFFI/out/
 Sources/BoringTunFFI/.tmp/
 *.a
 *.rlib
+BoringTun.xcframework/
 
 # Xcode
 *.xcodeproj
@@ -18,5 +19,5 @@ Sources/BoringTunFFI/.tmp/
 xcuserdata/
 DerivedData/
 
-# Platform artifactsC
+# Platform artifacts
 .DS_Store

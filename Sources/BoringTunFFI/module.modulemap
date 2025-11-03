@@ -1,4 +1,4 @@
-module BoringTunFFI {
+module BoringTun {
     header "boringtun.h"
     export *
 }
